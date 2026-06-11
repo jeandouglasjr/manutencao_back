@@ -10,7 +10,7 @@ import {
   atualizarHistorico,
   excluirHistorico,
   // Adicione as outras funções aqui
-} from "../controllers/historico_Adocao.js";
+} from "../controllers/historico_adocao.js";
 
 // Rotas:
 routerHistoricoAdocao.get("/historico_adocao", listarHistorico);
