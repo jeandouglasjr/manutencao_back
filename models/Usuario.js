@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 import { conexao } from "../database.js";
-import bcrypt from "bcrypt"; // 💡 Importar bcrypt
+import bcrypt from "bcrypt"; 
 
 const Usuario = conexao.define(
   "Usuario",
@@ -17,17 +17,17 @@ const Usuario = conexao.define(
     email: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true, // 💡 Garante que emails sejam únicos
+      unique: true, 
     },
     cpf: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true, // 💡 Garante que CPFs sejam únicos
+      unique: true, 
     },
     fone: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true, // 💡 Garante que FONEs sejam únicos
+      unique: true, 
     },
     senha: {
       type: DataTypes.STRING,
@@ -38,16 +38,13 @@ const Usuario = conexao.define(
     createdAt: "data_cadastro",
     freezeTableName: true,
     updatedAt: true,
-    // 💡 HOOK PARA HASH DA SENHA ANTES DE SALVAR
     hooks: {
       beforeCreate: async (usuario) => {
         if (usuario.senha) {
-          // Gera o hash com custo de 10 (padrão seguro)
           const salt = await bcrypt.genSalt(10);
           usuario.senha = await bcrypt.hash(usuario.senha, salt);
         }
       },
-      // Opcional: Hook para atualizar a senha se ela for modificada
       beforeUpdate: async (usuario) => {
         if (usuario.changed("senha") && usuario.senha) {
           const salt = await bcrypt.genSalt(10);
@@ -59,11 +56,12 @@ const Usuario = conexao.define(
 );
 
 Usuario.associate = (models) => {
-  // Um usuário tem muitos endereços (1..*)
+  // Corrigido: Adicionado explicitamente o 'as: "enderecos"' em minúsculo
   Usuario.hasMany(models.Endereco, {
-  foreignKey: 'id_usuario',
-  onDelete: 'CASCADE',
-  hooks: true
+    foreignKey: 'id_usuario',
+    as: 'enderecos',
+    onDelete: 'CASCADE',
+    hooks: true
   });
 };
 
