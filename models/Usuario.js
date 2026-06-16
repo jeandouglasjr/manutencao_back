@@ -61,8 +61,9 @@ const Usuario = conexao.define(
 Usuario.associate = (models) => {
   // Um usuário tem muitos endereços (1..*)
   Usuario.hasMany(models.Endereco, {
-    foreignKey: "id_usuario",
-    as: "enderecos",
+  foreignKey: 'id_usuario',
+  onDelete: 'CASCADE',
+  hooks: true
   });
 };
 
