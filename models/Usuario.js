@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 import { conexao } from "../database.js";
-import bcrypt from "bcrypt"; 
+import bcrypt from "bcryptjs";
 
 const Usuario = conexao.define(
   "Usuario",
