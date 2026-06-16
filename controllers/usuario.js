@@ -87,7 +87,7 @@ async function criar(req, res) {
     // Use a opção 'include' para criar os dados aninhados
     const usuarioCriado = await Usuario.create(dadosCompletos, {
       include: [
-        { model: Endereco, as: "enderecos" }, // 'enderecos' deve corresponder ao 'as' da associação
+        { model: Endereco, as: "Enderecos" }, // 'enderecos' deve corresponder ao 'as' da associação
       ],
     });
 
