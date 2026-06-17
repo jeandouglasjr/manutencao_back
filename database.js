@@ -7,13 +7,14 @@ if (!process.env.BANCO_DE_DADOS) {
   console.error("❌ ERRO: A variável de ambiente BANCO_DE_DADOS não foi definida!");
 }
 
-const sequelize = new Sequelize(process.env.BANCO_DE_DADOS, {
+// Criando a instância com o nome 'conexao' exigido pelos seus modelos e app.js
+const conexao = new Sequelize(process.env.BANCO_DE_DADOS, {
   dialect: "postgres",
   logging: false, // Evita logs excessivos no painel da Vercel
   dialectOptions: {
     ssl: {
       require: true,
-      rejectUnauthorized: false // Permite certificados autoassinados da AWS/Supabase
+      rejectUnauthorized: false // Obrigatório para o Supabase/AWS na Vercel
     }
   },
   pool: {
@@ -24,12 +25,13 @@ const sequelize = new Sequelize(process.env.BANCO_DE_DADOS, {
   }
 });
 
-// Teste de conexão opcional ao iniciar o módulo
+// Teste de conexão imediato
 try {
-  await sequelize.authenticate();
+  await conexao.authenticate();
   console.log("🚀 Conexão com o Supabase estabelecida com sucesso!");
 } catch (error) {
-  console.error("❌ Não foi possível conectar ao banco de dados:", error);
+  console.error("❌ Não foi possível conectar ao banco de dados:", error.message);
 }
 
-export default sequelize;
+// Exportando exatamente o nome que os seus arquivos estão procurando
+export { conexao };
