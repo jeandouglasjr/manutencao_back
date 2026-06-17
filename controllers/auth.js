@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import Usuario from "../models/Usuario.js"; // Ajuste o caminho se seu modelo estiver em outro lugar
+import { Usuario } from "../models/Usuario.js";
 
 const JWT_SECRET = process.env.JWT_SECRET || "chave_secreta_padrao";
 
