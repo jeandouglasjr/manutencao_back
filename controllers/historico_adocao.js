@@ -31,17 +31,18 @@ async function criarHistorico(req, res) {
 
     const novoRegistro = await Historico_Adocao.create({
       data_adocao,
-      observacao: observacao || "N/A", // Se observacao não for obrigatório, use valor padrão
+      observacao: observacao || "N/A",
       id_usuario,
       id_animal,
     });
 
-    res
-      .status(201)
-      .send({
-        mensagem: "Registro de Adoção criado com sucesso",
-        registro: novoRegistro,
-      });
+    // Atualizar o status do animal para 'Adotado'
+    await Animal.update({ status: "Adotado" }, { where: { id: id_animal } });
+
+    res.status(201).send({
+      mensagem: "Registro de Adoção criado com sucesso",
+      registro: novoRegistro,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).send({ mensagem: "Erro interno ao criar registro" });
@@ -116,12 +117,10 @@ async function excluirHistorico(req, res) {
       return res.status(400).send({ mensagem: "ID inválido" });
     }
 
-    // Exclui o registro baseado no ID. Retorna o número de linhas excluídas.
-    const linhasExcluidas = await Historico_Adocao.destroy({
-      where: { id },
-    });
+    // Primeiro buscamos o registro para saber qual animal era
+    const historico = await Historico_Adocao.findByPk(id);
 
-    if (linhasExcluidas === 0) {
+    if (!historico) {
       return res
         .status(404)
         .send({
@@ -129,10 +128,15 @@ async function excluirHistorico(req, res) {
         });
     }
 
-    // Status 204 (No Content) é comum para exclusões bem-sucedidas
-    res
-      .status(204)
-      .send({ mensagem: "Registro de Histórico excluído com sucesso" });
+    // Atualiza o status do animal de volta para 'Disponível' ao excluir a adoção
+    await Animal.update({ status: "Disponível" }, { where: { id: historico.id_animal } });
+
+    // Exclui o registro baseado no ID.
+    await Historico_Adocao.destroy({
+      where: { id },
+    });
+
+    res.status(200).send({ mensagem: "Registro de Histórico excluído com sucesso" });
   } catch (err) {
     console.error(err);
     res.status(500).send({ mensagem: "Erro interno ao excluir registro" });

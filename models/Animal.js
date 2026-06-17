@@ -41,6 +41,7 @@ const Animal = conexao.define(
     status: {
       type: DataTypes.STRING,
       allowNull: false,
+      defaultValue: "Indisponível",
     },
     data_resgate: {
       type: DataTypes.DATE,
