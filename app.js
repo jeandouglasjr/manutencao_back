@@ -14,25 +14,42 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// Rotas principais
 app.use("/", routerAuth);
 app.use("/", routerUsuario);
 app.use("/", routerAnimal);
 app.use("/", routerHistoricoAdocao);
 
-try {
-  await conexao.authenticate();
-  await conexao.sync({ alter: true });
-  console.log("Banco de dados conectado e sincronizado com sucesso.");
-} catch (erro) {
-  console.error("Erro ao conectar/sincronizar com o banco:", erro.message);
-  process.exit(1);
-}
+// Rota raiz de teste para você verificar se a API está viva pelo navegador
+app.get("/", (req, res) => {
+  res.json({ status: "online", mensagem: "Backend de Manutenção de Animais Ativo!" });
+});
 
+// Autenticação do banco de dados (Sem derrubar a aplicação na nuvem)
+conexao.authenticate()
+  .then(() => {
+    console.log("🚀 Banco de dados conectado com sucesso.");
+    
+    // Executa a sincronização apenas em desenvolvimento para não travar a Vercel
+    if (process.env.NODE_ENV !== "production") {
+      conexao.sync({ alter: true })
+        .then(() => console.log("Sincronização de tabelas concluída."))
+        .catch(err => console.error("Erro na sincronização:", err.message));
+    }
+  })
+  .catch((erro) => {
+    console.error("❌ Erro ao conectar com o banco:", erro.message);
+    // Não usamos process.exit(1) aqui na Vercel para a função não morrer
+  });
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-});
+// O app.listen SÓ deve ser executado localmente
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Servidor rodando localmente na porta ${PORT}`);
+  });
+}
 
+// Exportação obrigatória para as Serverless Functions da Vercel
 export default app;
