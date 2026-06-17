@@ -4,18 +4,32 @@ import dotenv from "dotenv";
 dotenv.config();
 
 if (!process.env.BANCO_DE_DADOS) {
-  throw new Error("Variavel BANCO_DE_DADOS nao foi definida no arquivo .env");
+  console.error("❌ ERRO: A variável de ambiente BANCO_DE_DADOS não foi definida!");
 }
 
-const conexao = new Sequelize(process.env.BANCO_DE_DADOS, {
+const sequelize = new Sequelize(process.env.BANCO_DE_DADOS, {
   dialect: "postgres",
-  logging: false,
+  logging: false, // Evita logs excessivos no painel da Vercel
   dialectOptions: {
     ssl: {
       require: true,
-      rejectUnauthorized: false,
-    },
+      rejectUnauthorized: false // Permite certificados autoassinados da AWS/Supabase
+    }
   },
+  pool: {
+    max: 5,
+    min: 0,
+    acquire: 30000,
+    idle: 10000
+  }
 });
 
-export { conexao };
+// Teste de conexão opcional ao iniciar o módulo
+try {
+  await sequelize.authenticate();
+  console.log("🚀 Conexão com o Supabase estabelecida com sucesso!");
+} catch (error) {
+  console.error("❌ Não foi possível conectar ao banco de dados:", error);
+}
+
+export default sequelize;
