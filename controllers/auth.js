@@ -1,6 +1,6 @@
 // src/controllers/auth.js
 import { Usuario } from "../models/index.js";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 // Assumindo que você tem o SECRET em um arquivo .env
