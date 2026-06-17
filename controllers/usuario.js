@@ -117,10 +117,14 @@ async function editar(req, res) {
 
   try {
     // 1. Editar a tabela principal (USUARIO)
-    await Usuario.update(
-      { nome, email, cpf, fone, senha },
-      { where: { id }, transaction: t }
-    );
+    const dadosUpdate = { nome, email, cpf, fone };
+    if (senha) dadosUpdate.senha = senha;
+
+    await Usuario.update(dadosUpdate, {
+      where: { id },
+      transaction: t,
+      individualHooks: true,
+    });
 
     // 2. Tratar Endereços: Apagar os antigos e criar os novos
     if (enderecos && enderecos.length > 0) {

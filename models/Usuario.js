@@ -39,13 +39,7 @@ const Usuario = conexao.define(
     freezeTableName: true,
     updatedAt: true,
     hooks: {
-      beforeCreate: async (usuario) => {
-        if (usuario.senha) {
-          const salt = await bcrypt.genSalt(10);
-          usuario.senha = await bcrypt.hash(usuario.senha, salt);
-        }
-      },
-      beforeUpdate: async (usuario) => {
+      beforeSave: async (usuario) => {
         if (usuario.changed("senha") && usuario.senha) {
           const salt = await bcrypt.genSalt(10);
           usuario.senha = await bcrypt.hash(usuario.senha, salt);
